@@ -29,7 +29,11 @@ jobs:
         cp ${{ github.workspace }}/dist/worker.js ${{ github.workspace }}/dist/worker-original.js
         echo -e "/*!\n  * v2ray Subscription Worker (${{ github.sha }})\n  * Copyright 2024 Vahid Farid (https://twitter.com/vahidfarid)\n  * Licensed under GPLv3 (https://github.com/vfarid/v2ray-worker/blob/main/Licence.md)\n  */\n\n$(cat ${{ github.workspace }}/dist/worker.js)" > ${{ github.workspace }}/dist/worker.js
 
+    - name: Replace KV_NAME
+      run: sed -i "s/KV_NAME/${{ secrets.KV_NAME }}/g" wrangler.toml
+
     - name: Deploy
-      run: |
-        sed -i "s/KV_NAME/${{ secrets.KV_NAME }}/g" wrangler.toml
-        npx wrangler publish --api-token ${{ secrets.CF_API_TOKEN }} --account-id ${{ secrets.CF_ACCOUNT_ID }}
+      run: npx wrangler deploy
+      env:
+        CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
